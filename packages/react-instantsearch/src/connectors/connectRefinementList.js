@@ -77,7 +77,7 @@ export default createConnector({
     limitMax: 20,
   },
 
-  getProvidedProps(props, searchState, searchResults) {
+  getProvidedProps(props, searchState, searchResults, metadata, facetValuesResults) {
     const {results} = searchResults;
     const {attributeName, showMore, limitMin, limitMax} = props;
     const limit = showMore ? limitMax : limitMin;
@@ -90,19 +90,31 @@ export default createConnector({
       return null;
     }
 
-    const items = results
-      .getFacetValues(attributeName, {sortBy})
-      .slice(0, limit)
-      .map(v => ({
-        label: v.name,
-        value: getValue(v.name, props, searchState),
-        count: v.count,
-        isRefined: v.isRefined,
-      }));
+    const items = facetValuesResults && facetValuesResults[attributeName]
+      ? facetValuesResults[attributeName]
+        .slice(0, limit).map(
+          v => ({
+            label: v.value,
+            value: getValue(v.value, props, searchState),
+            _highlightResult: {label: {value: v.highlighted}},
+            count: v.count,
+            isRefined: v.isRefined,
+          }))
+      : results
+        .getFacetValues(attributeName, {sortBy})
+        .slice(0, limit)
+        .map(v => ({
+          label: v.name,
+          value: getValue(v.name, props, searchState),
+          count: v.count,
+          isRefined: v.isRefined,
+        }));
+    const isFromSearch = Boolean(facetValuesResults && facetValuesResults[attributeName]);
 
     return {
       items,
       currentRefinement: getCurrentRefinement(props, searchState),
+      isFromSearch,
     };
   },
 
@@ -119,6 +131,10 @@ export default createConnector({
       // {foo: []} => ""
       [namespace]: {...searchState[namespace], [id]: nextRefinement.length > 0 ? nextRefinement : ''},
     };
+  },
+
+  searchForFacetValues(props, searchState, nextRefinement) {
+    return {facetName: props.attributeName, query: nextRefinement};
   },
 
   cleanUp(props, searchState) {

@@ -65,3 +65,14 @@
 
 .ais-RefinementList__itemCheckboxSelected{
 }
+
+.ais-RefinementList__SearchBox input.ais-SearchBox__input[type="search"]{
+  @extends input.ais-SearchBox__input[type="search"];
+  padding: 5px 44px;
+  margin-bottom: 5px;
+}
+
+.ais-RefinementList__SearchBox .ais-SearchBox__reset {
+  @extends .ais-SearchBox__reset;
+  top: 0.3em;
+}

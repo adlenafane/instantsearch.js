@@ -81,6 +81,7 @@ class InstantSearch extends Component {
         ais: {
           onInternalStateUpdate: this.onWidgetsInternalStateUpdate.bind(this),
           createHrefForState: this.createHrefForState.bind(this),
+          onSearchForFacetValues: this.onSearchForFacetValues.bind(this),
         },
       };
     }
@@ -109,6 +110,10 @@ class InstantSearch extends Component {
     if (!this.isControlled) {
       this.aisManager.onExternalStateUpdate(searchState);
     }
+  }
+
+  onSearchForFacetValues(searchState) {
+    this.aisManager.onSearchForFacetValues(searchState);
   }
 
   getKnownKeys() {
